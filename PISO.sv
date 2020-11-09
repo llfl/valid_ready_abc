@@ -36,14 +36,13 @@ module PISO
             tmp <= 2;
         end else begin
             curr_state <= next_state;
-        end
+            if (dout.ready && dout.valid && ~tmp_empty) begin
+                tmp <= {1'b0, tmp[DATAWIDTH:1]};
+            end
 
-        if (dout.ready && dout.valid && ~tmp_empty) begin
-            tmp <= {1'b0, tmp[DATAWIDTH:1]};
-        end
-
-        if (din.ready && din.valid) begin
-            tmp <= {1'b1, din.data};
+            if (din.ready && din.valid) begin
+                tmp <= {1'b1, din.data};
+            end
         end
 
     end: mainfunc
