@@ -9,7 +9,8 @@ module PISO
         input clk,
         input rst_n,
         valid_ready_std_if.in din,
-        valid_ready_std_if.out dout
+        valid_ready_std_if.out dout,
+        output last
     );
 
     typedef enum bit [1:0] { IDLE=2'b00,
@@ -17,35 +18,32 @@ module PISO
                              WAIT=2'b11,
                              SEND=2'b10 } states;
 
-    reg [DATAWIDTH-1:0] tmp;
-    reg [DATAWIDTH-1:0] cnt;
+    reg [DATAWIDTH:0] tmp;
 
     states curr_state;
     states next_state;
 
     logic tmp_empty;
-    assign tmp_empty = (cnt == 0) ? 1'b1 : 1'b0;
+    assign tmp_empty = (tmp[DATAWIDTH:1] == 1) ? 1'b1 : 1'b0;
 
-    assign din.ready  = tmp_empty;
-    assign dout.valid = dout.ready | ~tmp_empty;
+    assign din.ready  = tmp_empty & din.valid ;
+    assign dout.valid = dout.ready | ~tmp_empty ;
+    assign last = dout.valid & tmp_empty;
 
     always_ff @(posedge clk or negedge rst_n) begin: mainfunc
         if (~rst_n) begin
             curr_state <= RECV;
-            cnt <= 0;
-            tmp <= 0;
+            tmp <= 2;
         end else begin
             curr_state <= next_state;
         end
 
-        if (dout.ready && dout.valid) begin
-            cnt <= {1'b0, cnt[DATAWIDTH-1:1]};
-            tmp <= {1'b0, tmp[DATAWIDTH-1:1]};
+        if (dout.ready && dout.valid && ~tmp_empty) begin
+            tmp <= {1'b0, tmp[DATAWIDTH:1]};
         end
 
         if (din.ready && din.valid) begin
-            cnt[DATAWIDTH-2] <= 1'b1;
-            tmp <= din.data;
+            tmp <= {1'b1, din.data};
         end
 
     end: mainfunc
@@ -67,7 +65,7 @@ module PISO
         endcase
     end: processing_state
 
-    assign dout.data[0] = tmp[0] & (dout.ready & dout.valid);
-    assign dout.data[1] = ~tmp[0] & (dout.ready & dout.valid);
+    assign dout.data[0] =  tmp[0] & dout.valid;
+    assign dout.data[1] = ~tmp[0] & dout.valid;
 
 endmodule: PISO

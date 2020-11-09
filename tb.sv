@@ -6,6 +6,8 @@ module tb_PISO;
 reg clk;
 reg rst_n;
 
+wire last;
+
 
 valid_ready_std_if #(.DATAWIDTH(8)) piso_in();
 valid_ready_std_if #(.DATAWIDTH(2)) piso_out();
@@ -15,7 +17,8 @@ PISO m1
     .rst_n (rst_n),
     .clk (clk),
     .din(piso_in.in),
-    .dout(piso_out.out)
+    .dout(piso_out.out),
+    .last(last)
 );
 
 localparam CLK_PERIOD = 10;
@@ -47,8 +50,25 @@ initial begin
     piso_out.ready <= 0;
     repeat(3) @(posedge clk);
     piso_out.ready <= 1;
-    repeat(50) @(posedge clk);
-
+    repeat(47) @(posedge clk);
+    piso_in.valid <= 0;
+    repeat(20) @(posedge clk);
+    piso_in.data <= 8'b1010_1101;
+    piso_in.valid <= 1;
+    repeat(1) @(posedge clk);
+    piso_in.valid <= 0;
+    repeat(20) @(posedge clk);
+    piso_in.valid <= 1;
+    repeat(1) @(posedge clk);
+    piso_in.valid <= 0;
+    piso_out.ready <= 0;
+    repeat(1) @(posedge clk);
+    piso_out.ready <= 1;
+    repeat(2) @(posedge clk);
+    piso_out.ready <= 0;
+    repeat(3) @(posedge clk);
+    piso_out.ready <= 1;
+    repeat(20) @(posedge clk);
     $finish(2);
 end
 

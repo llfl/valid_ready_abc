@@ -29,7 +29,7 @@ VCS = vcs -sverilog +v2k -timescale=1ns/1ns                             \
 	  -Mupdate
 
 VCS += -ntb_opts uvm-1.2 -CC -DVCS
-VCS += -fsdb
+VCS += -full64 -fsdb
 
 SIM = ./${OUTPUT} -l run.log \
 	  ${CM}					\
@@ -53,4 +53,4 @@ debug:
 	dve -vpd ${OUTPUT}.vpd &
 
 clean:
-	rm -rf ./csrc *.daidir *.log simv* *.key *.vpd ./DVEfiles ${OUTPUT} vc_hdrs.h *.vdb *.fsdb
+	rm -rf ./csrc *.daidir *.log simv* *.key *.vpd ./DVEfiles ${OUTPUT} vc_hdrs.h *.vdb *.fsdb .fsm.sch.verilog.xml ./verdiLog novas.conf novas.rc
