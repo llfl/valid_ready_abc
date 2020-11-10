@@ -45,6 +45,9 @@ com:
 sim:
 	${SIM}
 
+verdi:
+	verdi -sv -f filelist.f
+
 #show the coverage
 cov:
 	dve -covdir *.vdb &
@@ -53,4 +56,4 @@ debug:
 	dve -vpd ${OUTPUT}.vpd &
 
 clean:
-	rm -rf ./csrc *.daidir *.log simv* *.key *.vpd ./DVEfiles ${OUTPUT} vc_hdrs.h *.vdb *.fsdb .fsm.sch.verilog.xml ./verdiLog novas.conf novas.rc
+	rm -rf ./csrc *.daidir *.log simv* *.key *.vpd ./DVEfiles ${OUTPUT} vc_hdrs.h *.vdb *.fsdb .fsm.sch.verilog.xml novas.conf novas.rc

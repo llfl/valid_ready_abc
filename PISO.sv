@@ -27,7 +27,7 @@ module PISO
     assign tmp_empty = (tmp[DATAWIDTH:1] == 1) ? 1'b1 : 1'b0;
 
     assign din.ready  = tmp_empty;
-    assign dout.valid = dout.ready | ~tmp_empty ;
+    assign dout.valid = ~tmp_empty | din.valid;
     assign last = dout.valid & tmp_empty & (curr_state != RECV);
 
     always_ff @(posedge clk or negedge rst_n) begin: mainfunc
