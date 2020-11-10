@@ -69,6 +69,8 @@ initial begin
     repeat(3) @(posedge clk);
     piso_out.ready <= 1;
     repeat(20) @(posedge clk);
+    piso_out.ready <= 0;
+    repeat(20) @(posedge clk);
     $finish(2);
 end
 

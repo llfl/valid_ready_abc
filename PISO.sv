@@ -26,9 +26,9 @@ module PISO
     logic tmp_empty;
     assign tmp_empty = (tmp[DATAWIDTH:1] == 1) ? 1'b1 : 1'b0;
 
-    assign din.ready  = tmp_empty & din.valid ;
+    assign din.ready  = tmp_empty;
     assign dout.valid = dout.ready | ~tmp_empty ;
-    assign last = dout.valid & tmp_empty;
+    assign last = dout.valid & tmp_empty & (curr_state != RECV);
 
     always_ff @(posedge clk or negedge rst_n) begin: mainfunc
         if (~rst_n) begin
@@ -50,7 +50,7 @@ module PISO
     always_comb begin: processing_state
         case (curr_state)
             RECV : begin
-                next_state = din.valid ? (dout.ready ? SEND : WAIT) : RECV;
+                next_state = din.valid ? SEND : RECV;
             end
             WAIT : begin
                 next_state = dout.ready ? SEND : WAIT;
@@ -64,7 +64,7 @@ module PISO
         endcase
     end: processing_state
 
-    assign dout.data[0] =  tmp[0] & dout.valid;
-    assign dout.data[1] = ~tmp[0] & dout.valid;
+    assign dout.data[0] =  tmp[0] & dout.valid & ((curr_state != RECV) | ~tmp_empty);
+    assign dout.data[1] = ~tmp[0] & dout.valid & ((curr_state != RECV) | ~tmp_empty);
 
 endmodule: PISO

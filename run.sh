@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make clean && git pull && make
+git pull && make
